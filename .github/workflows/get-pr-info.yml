@@ -1,0 +1,31 @@
+name: Get PR info
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+    
+      - name: Get PR Number
+        id: get_pr_number
+        run: |
+          PR_NUMBER=$(jq --raw-output .pull_request.number ${GITHUB_EVENT_PATH})
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
+        if: github.event.pull_request.merged == true
+
+      - name: Get PR Details using API
+        run: |
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" > pr_info.json
+          cat pr_info.json
+
+      - name: Display PR Title
+        run: |
+          TITLE=$(jq --raw-output .title pr_info.json)
+          echo "Pull Request Title: $TITLE"
