@@ -15,9 +15,9 @@ jobs:
       - name: Get PR Number
         id: get_pr_number
         run: |
+          echo "${GITHUB_EVENT_PATH})"
           PR_NUMBER=$(jq --raw-output .pull_request.number ${GITHUB_EVENT_PATH})
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
-        if: github.event.pull_request.merged == true
 
       - name: Get PR Details using API
         run: |
